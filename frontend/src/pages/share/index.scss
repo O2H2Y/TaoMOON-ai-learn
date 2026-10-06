@@ -1,0 +1,172 @@
+/* 完整版报告分享页（免登录只读） */
+
+.share-page {
+  min-height: 100vh;
+  padding: 24px 32px 60px;
+  background: linear-gradient(180deg, #fafbfd 0%, #f0f4f9 100%);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.share-header {
+  padding: 24px 28px;
+  border-radius: 36px;
+  border: 2px solid #e2e8f2;
+  background: #ffffff;
+}
+
+.share-brand {
+  display: block;
+  color: #4a6291;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.share-title {
+  display: block;
+  margin-top: 12px;
+  color: #34424c;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.share-summary {
+  display: block;
+  margin-top: 12px;
+  color: #687782;
+  font-size: 26px;
+  line-height: 1.6;
+}
+
+.share-card {
+  margin-top: 24px;
+  padding: 26px;
+  border-radius: 40px;
+  border: 2px solid #e2e8f2;
+  background: #fff;
+}
+
+.card-title {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.share-mastery {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+
+.share-accuracy {
+  color: #24589f;
+  font-size: 72px;
+  font-weight: 800;
+}
+
+.share-mastery-desc {
+  color: #687782;
+  font-size: 26px;
+}
+
+.share-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.share-item {
+  display: block;
+  color: #6d7c88;
+  font-size: 28px;
+  line-height: 1.7;
+}
+
+.share-question {
+  padding: 20px;
+  border-radius: 28px;
+  border: 2px solid #e2e8f2;
+  background: #ffffff;
+}
+
+.share-question-stem {
+  display: block;
+  color: #33424d;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.share-question-image {
+  display: block;
+  width: 100%;
+  height: 280px;
+  margin-top: 16px;
+  border-radius: 20px;
+}
+
+.share-question-result {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.share-question-result.is-correct {
+  color: #29986d;
+}
+
+.share-question-result.is-wrong {
+  color: #c0453a;
+}
+
+.share-question-answer {
+  display: block;
+  margin-top: 8px;
+  color: #24589f;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.share-question-explanation {
+  display: block;
+  margin-top: 8px;
+  color: #6d7c88;
+  font-size: 24px;
+  line-height: 1.6;
+}
+
+.share-actions {
+  display: flex;
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.share-action {
+  flex: 1;
+}
+
+.share-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160px 0;
+  gap: 20px;
+}
+
+.share-state-emoji {
+  font-size: 72px;
+}
+
+.share-state-text {
+  color: #687782;
+  font-size: 30px;
+}
+
+.share-state-btn {
+  margin-top: 12px;
+  padding: 16px 48px;
+}
