@@ -1,0 +1,60 @@
+{"id":"gen-01","category":"学科常识","user_input":"光合作用","question_count":5,"difficulty":"mixed"}
+{"id":"gen-02","category":"学科常识","user_input":"勾股定理及其应用","question_count":5,"difficulty":"easy"}
+{"id":"gen-03","category":"学科常识","user_input":"我想复习一下高中化学的氧化还原反应","question_count":5,"difficulty":"mixed"}
+{"id":"gen-04","category":"学科常识","user_input":"牛顿三大定律","question_count":5,"difficulty":"medium"}
+{"id":"gen-05","category":"学科常识","user_input":"英语现在完成时和一般过去时的区别","question_count":5,"difficulty":"mixed"}
+{"id":"gen-06","category":"学科常识","user_input":"细胞有丝分裂","question_count":8,"difficulty":"mixed"}
+{"id":"gen-07","category":"学科常识","user_input":"唐诗宋词常识","question_count":5,"difficulty":"mixed"}
+{"id":"gen-08","category":"学科常识","user_input":"经济学里的供给与需求","question_count":5,"difficulty":"easy"}
+{"id":"gen-09","category":"学科常识","user_input":"概率论中的条件概率和贝叶斯公式","question_count":5,"difficulty":"hard"}
+{"id":"gen-10","category":"学科常识","user_input":"中国法律中的民法典基础常识","question_count":5,"difficulty":"mixed"}
+{"id":"tech-01","category":"编程与AI","user_input":"Python 装饰器","question_count":5,"difficulty":"mixed"}
+{"id":"tech-02","category":"编程与AI","user_input":"什么是 RAG，它和传统搜索有什么区别","question_count":5,"difficulty":"mixed"}
+{"id":"tech-03","category":"编程与AI","user_input":"Transformer 的自注意力机制","question_count":5,"difficulty":"hard"}
+{"id":"tech-04","category":"编程与AI","user_input":"HTTP 和 HTTPS 的区别","question_count":5,"difficulty":"easy"}
+{"id":"tech-05","category":"编程与AI","user_input":"MySQL 索引原理与 B+ 树","question_count":5,"difficulty":"medium"}
+{"id":"tech-06","category":"编程与AI","user_input":"Git 分支与合并","question_count":5,"difficulty":"mixed"}
+{"id":"tech-07","category":"编程与AI","user_input":"React Hooks 入门","question_count":5,"difficulty":"mixed"}
+{"id":"tech-08","category":"编程与AI","user_input":"机器学习中的过拟合与正则化","question_count":8,"difficulty":"mixed"}
+{"id":"tech-09","category":"编程与AI","user_input":"Docker 容器和虚拟机有什么不同","question_count":5,"difficulty":"mixed"}
+{"id":"tech-10","category":"编程与AI","user_input":"LangGraph 的 ReAct Agent 是怎么工作的","question_count":5,"difficulty":"mixed"}
+{"id":"hist-01","category":"历史地理","user_input":"秦始皇统一六国","question_count":5,"difficulty":"mixed"}
+{"id":"hist-02","category":"历史地理","user_input":"第二次世界大战的主要转折点","question_count":5,"difficulty":"medium"}
+{"id":"hist-03","category":"历史地理","user_input":"中国的四大高原和四大盆地","question_count":5,"difficulty":"easy"}
+{"id":"hist-04","category":"历史地理","user_input":"丝绸之路","question_count":5,"difficulty":"mixed"}
+{"id":"hist-05","category":"历史地理","user_input":"文艺复兴运动","question_count":5,"difficulty":"mixed"}
+{"id":"hist-06","category":"历史地理","user_input":"世界七大洲和四大洋","question_count":5,"difficulty":"easy"}
+{"id":"hist-07","category":"历史地理","user_input":"工业革命对社会的影响","question_count":5,"difficulty":"mixed"}
+{"id":"hist-08","category":"历史地理","user_input":"明朝郑和下西洋","question_count":5,"difficulty":"mixed"}
+{"id":"sci-01","category":"科普","user_input":"黑洞是怎么形成的","question_count":5,"difficulty":"mixed"}
+{"id":"sci-02","category":"科普","user_input":"人体免疫系统","question_count":5,"difficulty":"mixed"}
+{"id":"sci-03","category":"科普","user_input":"为什么天空是蓝色的","question_count":5,"difficulty":"easy"}
+{"id":"sci-04","category":"科普","user_input":"温室效应与全球变暖","question_count":5,"difficulty":"mixed"}
+{"id":"sci-05","category":"科普","user_input":"DNA 双螺旋结构","question_count":5,"difficulty":"medium"}
+{"id":"sci-06","category":"科普","user_input":"疫苗的工作原理","question_count":5,"difficulty":"mixed"}
+{"id":"sci-07","category":"科普","user_input":"太阳系八大行星","question_count":5,"difficulty":"easy"}
+{"id":"sci-08","category":"科普","user_input":"睡眠的科学：深睡眠和 REM","question_count":5,"difficulty":"mixed"}
+{"id":"news-01","category":"时效性","user_input":"2026 年诺贝尔物理学奖","question_count":5,"difficulty":"mixed"}
+{"id":"news-02","category":"时效性","user_input":"最新发布的大语言模型有哪些","question_count":5,"difficulty":"mixed"}
+{"id":"news-03","category":"时效性","user_input":"2026 年世界杯","question_count":5,"difficulty":"mixed"}
+{"id":"news-04","category":"时效性","user_input":"DeepSeek V4 有哪些新特性","question_count":5,"difficulty":"mixed"}
+{"id":"news-05","category":"时效性","user_input":"中国空间站最新进展","question_count":5,"difficulty":"mixed"}
+{"id":"news-06","category":"时效性","user_input":"MCP 模型上下文协议","question_count":5,"difficulty":"mixed"}
+{"id":"amb-01","category":"歧义术语","user_input":"Harness","question_count":5,"difficulty":"mixed"}
+{"id":"amb-02","category":"歧义术语","user_input":"Java","question_count":5,"difficulty":"mixed"}
+{"id":"amb-03","category":"歧义术语","user_input":"Spring","question_count":5,"difficulty":"mixed"}
+{"id":"amb-04","category":"歧义术语","user_input":"苹果","question_count":5,"difficulty":"mixed"}
+{"id":"amb-05","category":"歧义术语","user_input":"Mercury","question_count":5,"difficulty":"mixed"}
+{"id":"amb-06","category":"歧义术语","user_input":"RSI","question_count":5,"difficulty":"mixed"}
+{"id":"long-01","category":"长段落","user_input":"我是大一新生，最近在学数据结构，老师讲了栈和队列，我总是分不清它们的应用场景，比如函数调用、括号匹配、广度优先搜索分别用什么，能不能帮我出几道题巩固一下？","question_count":5,"difficulty":"mixed"}
+{"id":"long-02","category":"长段落","user_input":"下周要考公务员行测，常识判断部分我比较薄弱，尤其是宪法和国家机构相关的内容，比如全国人大的职权、国务院的组成、宪法修改的程序，想练一练。","question_count":8,"difficulty":"mixed"}
+{"id":"long-03","category":"长段落","user_input":"我在准备产品经理面试，想检验一下自己对用户增长的理解，比如 AARRR 漏斗模型、留存率怎么计算、DAU/MAU 的含义、A/B 测试要注意什么。","question_count":5,"difficulty":"medium"}
+{"id":"long-04","category":"长段落","user_input":"孩子上小学三年级，最近学到了分数的初步认识，想让他在小程序里做几道题，题目要简单一点，最好跟生活场景相关，比如分披萨、分苹果。","question_count":5,"difficulty":"easy"}
+{"id":"long-05","category":"长段落","user_input":"最近在看《人类简史》，书里讲了认知革命、农业革命和科学革命，作者认为农业革命是史上最大的骗局，我想测测自己有没有读懂这些核心观点。","question_count":5,"difficulty":"mixed"}
+{"id":"long-06","category":"长段落","user_input":"我是护理专业学生，要复习常见的生命体征正常值，比如成人正常体温、脉搏、呼吸频率、血压范围，以及测量时的注意事项。","question_count":5,"difficulty":"mixed"}
+{"id":"url-01","category":"含URL","user_input":"https://zh.wikipedia.org/wiki/光合作用","question_count":5,"difficulty":"mixed"}
+{"id":"url-02","category":"含URL","user_input":"帮我根据这篇文章出题：https://docs.python.org/zh-cn/3/tutorial/classes.html","question_count":5,"difficulty":"mixed"}
+{"id":"url-03","category":"含URL","user_input":"https://en.wikipedia.org/wiki/Retrieval-augmented_generation","question_count":5,"difficulty":"mixed"}
+{"id":"url-04","category":"含URL","user_input":"根据 https://react.dev/learn 这个页面出几道 React 入门题","question_count":5,"difficulty":"easy"}
+{"id":"url-05","category":"含URL","user_input":"https://zh.wikipedia.org/wiki/丝绸之路","question_count":5,"difficulty":"mixed"}
+{"id":"url-06","category":"含URL","user_input":"https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm 宪法相关题目","question_count":5,"difficulty":"mixed"}
