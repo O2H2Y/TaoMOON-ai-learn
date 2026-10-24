@@ -39,7 +39,9 @@ async def main() -> None:
 
     from app.services.quiz_service import handle_quiz_generate
 
-    req = QuizGenerateRequest(user_input=args.user_input, question_count=args.count, difficulty=args.difficulty)
+    req = QuizGenerateRequest(
+        user_input=args.user_input, question_count=args.count, difficulty=args.difficulty, generate_images=False
+    )
     error = None
     response = None
     with start_run("quiz", harness="smoke", git_sha=_git_sha()) as run:
