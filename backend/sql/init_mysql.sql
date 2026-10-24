@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS quiz_sessions (
     summary TEXT NULL,
     user_input TEXT NULL,
     questions_json JSON NOT NULL,
+    prompt_version VARCHAR(64) NULL,
+    trace_id VARCHAR(64) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uk_quiz_sessions_quiz_id (quiz_id),
@@ -77,3 +79,7 @@ CREATE TABLE IF NOT EXISTS reports (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 已有库的增量迁移（P0：prompt 版本与 trace 关联）。新库可忽略；重复执行会报列已存在，可安全忽略。
+-- ALTER TABLE quiz_sessions ADD COLUMN prompt_version VARCHAR(64) NULL;
+-- ALTER TABLE quiz_sessions ADD COLUMN trace_id VARCHAR(64) NULL;

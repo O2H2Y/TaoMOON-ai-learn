@@ -8,6 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from app.llm.langchain_factory import get_chat_model
 from app.models.quiz import Question, AnswerRecord
 from app.models.report import ReportOutput
+from app.observability import build_langchain_config, record_llm_usage, record_raw_output
 from app.prompts.report_prompt import REPORT_HUMAN_PROMPT, REPORT_SYSTEM_PROMPT
 
 
@@ -45,8 +46,11 @@ async def generate_report(
                 [r.model_dump() for r in answer_records], ensure_ascii=False
             ),
             "score_summary": json.dumps(score_summary, ensure_ascii=False),
-        }
+        },
+        config=build_langchain_config("report_generate"),
     )
 
+    record_llm_usage("report_generate", getattr(llm, "model_name", ""), result)
+    record_raw_output("report_generate", result.content if isinstance(result.content, str) else "")
     data = _extract_json(result.content)
     return ReportOutput.model_validate(data)

@@ -6,6 +6,8 @@ import time
 import structlog
 
 from app.core.config import get_settings
+from app.observability import ContextResult, build_langchain_config, record_context, record_llm_usage, record_retrieval, stage
+from app.observability.run_context import extract_agent_trace
 from app.prompts.rag_prompt import RAG_AGENT_SYSTEM_PROMPT
 from app.services import vector_store_service
 
@@ -27,6 +29,11 @@ def _build_knowledge_base_tool(user_id: int, doc_id: str):
         except Exception as e:
             logger.warning("kb_retrieval_failed", user_id=user_id, doc_id=doc_id, error=str(e))
             return "知识库检索失败，未获取到内容。"
+
+        try:
+            record_retrieval(query, get_settings().kb_retrieve_top_k, docs, user_id=user_id, doc_id=doc_id)
+        except Exception:  # 记录失败不影响检索
+            pass
 
         if not docs:
             return "知识库中未检索到相关内容。"
@@ -103,19 +110,32 @@ async def fetch_rag_context(user_input: str, user_id: int, doc_id: str) -> str:
     Returns:
         知识摘要字符串，失败时返回空字符串
     """
+    result = await fetch_rag_context_result(user_input, user_id, doc_id)
+    return result.summary
+
+
+async def fetch_rag_context_result(user_input: str, user_id: int, doc_id: str) -> ContextResult:
+    """与 fetch_rag_context 行为一致，但返回包含原始证据的 ContextResult，并写入当前 RunRecord。"""
+    ctx = await _fetch(user_input, user_id, doc_id)
+    record_context(ctx)
+    return ctx
+
+
+async def _fetch(user_input: str, user_id: int, doc_id: str) -> ContextResult:
+    t0 = time.monotonic()
     try:
         logger.info("rag_agent_starting", user_id=user_id, doc_id=doc_id, user_input=user_input[:100])
 
-        t0 = time.monotonic()
         agent = _build_agent(user_id, doc_id)
 
-        result = await asyncio.wait_for(
-            agent.ainvoke(
-                {"messages": [{"role": "user", "content": user_input}]},
-                config={"recursion_limit": 10},
-            ),
-            timeout=AGENT_TIMEOUT_SECONDS,
-        )
+        with stage("rag_retrieve"):
+            result = await asyncio.wait_for(
+                agent.ainvoke(
+                    {"messages": [{"role": "user", "content": user_input}]},
+                    config=build_langchain_config("rag_agent", recursion_limit=10),
+                ),
+                timeout=AGENT_TIMEOUT_SECONDS,
+            )
         elapsed = round((time.monotonic() - t0) * 1000)
 
         messages = result.get("messages", [])
@@ -125,24 +145,49 @@ async def fetch_rag_context(user_input: str, user_id: int, doc_id: str) -> str:
             message_count=len(messages),
         )
 
-        content = messages[-1].content if messages else ""
-        if not content:
-            logger.warning("rag_agent_empty_response", user_id=user_id, doc_id=doc_id)
-            return ""
+        record_llm_usage("rag_agent", get_settings().deepseek_model, messages)
+        tool_calls, evidence = extract_agent_trace(messages)
 
+        raw = messages[-1].content if messages else ""
+        if not raw:
+            logger.warning("rag_agent_empty_response", user_id=user_id, doc_id=doc_id)
+            return ContextResult(
+                source="rag", status="empty", max_length=MAX_CONTEXT_LENGTH,
+                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed,
+            )
+
+        content = raw
+        truncated = False
         if len(content) > MAX_CONTEXT_LENGTH:
             content = content[:MAX_CONTEXT_LENGTH]
+            truncated = True
 
         logger.info("rag_context_fetched", user_id=user_id, doc_id=doc_id, length=len(content))
-        return content
+        return ContextResult(
+            source="rag",
+            status="ok",
+            summary=content,
+            raw_summary_length=len(raw),
+            truncated=truncated,
+            max_length=MAX_CONTEXT_LENGTH,
+            tool_calls=tool_calls,
+            evidence=evidence,
+            elapsed_ms=elapsed,
+        )
 
     except asyncio.TimeoutError:
         logger.warning(
             "rag_agent_timeout", timeout=AGENT_TIMEOUT_SECONDS, user_id=user_id, doc_id=doc_id
         )
-        return ""
+        return ContextResult(
+            source="rag", status="timeout", max_length=MAX_CONTEXT_LENGTH,
+            elapsed_ms=round((time.monotonic() - t0) * 1000),
+        )
     except Exception as e:
         logger.warning(
             "rag_agent_error", error=str(e), error_type=type(e).__name__, user_id=user_id, doc_id=doc_id
         )
-        return ""
+        return ContextResult(
+            source="rag", status="error", max_length=MAX_CONTEXT_LENGTH,
+            elapsed_ms=round((time.monotonic() - t0) * 1000), error=f"{type(e).__name__}: {e}"[:500],
+        )

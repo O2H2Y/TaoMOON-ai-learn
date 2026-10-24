@@ -36,6 +36,8 @@ SCHEMA_STATEMENTS: Final[list[str]] = [
         summary TEXT NULL,
         user_input TEXT NULL,
         questions_json JSON NOT NULL,
+        prompt_version VARCHAR(64) NULL,
+        trace_id VARCHAR(64) NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY uk_quiz_sessions_quiz_id (quiz_id),
@@ -148,6 +150,27 @@ SCHEMA_STATEMENTS: Final[list[str]] = [
 ]
 
 
+# 已存在的库不会因 CREATE TABLE IF NOT EXISTS 而新增列，这里做幂等的增量迁移：(表, 列, 列定义)
+COLUMN_MIGRATIONS: Final[list[tuple[str, str, str]]] = [
+    ("quiz_sessions", "prompt_version", "VARCHAR(64) NULL"),
+    ("quiz_sessions", "trace_id", "VARCHAR(64) NULL"),
+]
+
+
+async def _apply_column_migrations(cursor, database: str) -> None:
+    for table, column, ddl in COLUMN_MIGRATIONS:
+        await cursor.execute(
+            "SELECT COUNT(*) FROM information_schema.COLUMNS "
+            "WHERE TABLE_SCHEMA=%s AND TABLE_NAME=%s AND COLUMN_NAME=%s",
+            (database, table, column),
+        )
+        row = await cursor.fetchone()
+        if row and row[0]:
+            continue
+        await cursor.execute(f"ALTER TABLE `{table}` ADD COLUMN `{column}` {ddl}")
+        logger.info("mysql_column_added", table=table, column=column)
+
+
 async def init_mysql() -> None:
     """初始化数据库与基础表结构。"""
     global _pool
@@ -190,6 +213,7 @@ async def init_mysql() -> None:
         async with conn.cursor() as cursor:
             for statement in SCHEMA_STATEMENTS:
                 await cursor.execute(statement)
+            await _apply_column_migrations(cursor, settings.mysql_database)
 
     logger.info("mysql_initialized", database=settings.mysql_database)
 

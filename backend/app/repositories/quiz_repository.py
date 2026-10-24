@@ -19,6 +19,8 @@ async def save_quiz_session(
     summary: str,
     user_input: str,
     questions_json: list,
+    prompt_version: Optional[str] = None,
+    trace_id: Optional[str] = None,
 ) -> None:
     pool = get_mysql_pool()
     if pool is None:
@@ -26,8 +28,9 @@ async def save_quiz_session(
     async with pool.acquire() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO quiz_sessions (quiz_id, user_id, title, summary, user_input, questions_json) "
-                "VALUES (%s, %s, %s, %s, %s, %s)",
+                "INSERT INTO quiz_sessions "
+                "(quiz_id, user_id, title, summary, user_input, questions_json, prompt_version, trace_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (
                     quiz_id,
                     user_id,
@@ -35,6 +38,8 @@ async def save_quiz_session(
                     summary,
                     user_input,
                     json.dumps(questions_json, ensure_ascii=False),
+                    prompt_version,
+                    trace_id,
                 ),
             )
 

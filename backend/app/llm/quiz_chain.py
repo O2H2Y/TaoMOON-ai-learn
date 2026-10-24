@@ -8,6 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from app.llm.langchain_factory import get_chat_model
 from app.models.quiz import QuizOutput
+from app.observability import build_langchain_config, record_llm_usage, record_raw_output
 from app.prompts.quiz_prompt import QUIZ_HUMAN_PROMPT, QUIZ_SYSTEM_PROMPT, SEARCH_CONTEXT_TEMPLATE
 
 logger = structlog.get_logger()
@@ -51,10 +52,13 @@ async def generate_quiz(
             "question_count": question_count,
             "difficulty": difficulty,
             "search_context_section": search_context_section,
-        }
+        },
+        config=build_langchain_config("quiz_generate"),
     )
 
+    record_llm_usage("quiz_generate", getattr(llm, "model_name", ""), result)
     content = result.content
+    record_raw_output("quiz_generate", content if isinstance(content, str) else "")
     logger.debug("llm_quiz_raw_response", content_length=len(content), content_preview=content[:200] if content else "<empty>")
 
     if not content:

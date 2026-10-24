@@ -50,6 +50,17 @@ def _patch_async_client(*clients) -> MagicMock:
 
 
 @pytest.fixture(autouse=True)
+def _wechat_configured(monkeypatch):
+    """这些用例假设已配置小程序 appid/secret；不依赖本地 .env，保证在 CI 与干净环境中可复现。"""
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "wechat_app_id", "wx-test-appid")
+    monkeypatch.setattr(settings, "wechat_app_secret", "wx-test-secret")
+    yield
+
+
+@pytest.fixture(autouse=True)
 def _clear_token_cache():
     wechat_qrcode_service.reset_token_cache()
     yield

@@ -95,6 +95,13 @@ class Settings(BaseSettings):
     # Log
     log_level: str = "INFO"
 
+    # 可观测性：Langfuse tracing（未配置 key 时自动关闭，不影响业务）
+    enable_tracing: bool = True
+    langfuse_public_key: str = ""
+    langfuse_secret_key: str = ""
+    langfuse_host: str = "https://cloud.langfuse.com"
+    langfuse_environment: str = ""
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 

@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+
+# 评测运行产物（含真实 API 输出，不入库）
+evals/results/

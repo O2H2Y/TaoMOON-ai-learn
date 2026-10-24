@@ -22,6 +22,8 @@ from app.repositories import knowledge_repository
 from app.services import rag_service
 from app.services import image_service
 from app.services.search_service import fetch_knowledge_context
+from app.observability import start_run, stage
+from app.prompts.registry import prompt_version_tag
 
 logger = structlog.get_logger()
 
@@ -86,16 +88,33 @@ async def handle_quiz_generate(
     # 若指定了知识库文档，先校验其归属与状态
     await _validate_doc_id(req, user_id)
 
+    with start_run(
+        "quiz",
+        mode="sync",
+        source="rag" if req.doc_id else "web",
+        question_count=req.question_count,
+        difficulty=req.difficulty,
+        prompt_version=prompt_version_tag(),
+    ) as run:
+        return await _generate_and_persist(req, user_id, run.run_id)
+
+
+async def _generate_and_persist(
+    req: QuizGenerateRequest,
+    user_id: Optional[int],
+    run_id: str,
+) -> QuizGenerateResponse:
     # 获取参考资料：指定 doc_id 时走知识库 RAG，否则走联网搜索
     search_context = await _fetch_context(req, user_id)
 
     try:
-        quiz_output = await generate_quiz(
-            user_input=req.user_input,
-            question_count=req.question_count,
-            difficulty=req.difficulty,
-            search_context=search_context,
-        )
+        with stage("quiz_generate"):
+            quiz_output = await generate_quiz(
+                user_input=req.user_input,
+                question_count=req.question_count,
+                difficulty=req.difficulty,
+                search_context=search_context,
+            )
     except Exception as e:
         logger.error("quiz_generation_failed", error=str(e))
         raise QuizGenerationError(f"题库生成失败：{e}") from e
@@ -103,7 +122,8 @@ async def handle_quiz_generate(
     quiz_id = f"quiz_{uuid.uuid4().hex[:12]}"
 
     # 按需为题目生成配图（不影响出题主流程）
-    image_notice = await _maybe_generate_images(quiz_output, quiz_id, user_id, req.generate_images)
+    with stage("image_generate"):
+        image_notice = await _maybe_generate_images(quiz_output, quiz_id, user_id, req.generate_images)
 
     # 有登录态时落库
     if user_id is not None:
@@ -115,6 +135,8 @@ async def handle_quiz_generate(
                 summary=quiz_output.summary,
                 user_input=req.user_input,
                 questions_json=[q.model_dump() for q in quiz_output.questions],
+                prompt_version=prompt_version_tag(),
+                trace_id=run_id,
             )
         except Exception as e:
             logger.error("quiz_session_save_failed", error=str(e))
@@ -163,6 +185,24 @@ async def _run_quiz_task(
     user_id: Optional[int],
 ) -> None:
     """后台执行出题任务"""
+    with start_run(
+        "quiz",
+        mode="task",
+        task_id=task_id,
+        source="rag" if req.doc_id else "web",
+        question_count=req.question_count,
+        difficulty=req.difficulty,
+        prompt_version=prompt_version_tag(),
+    ) as run:
+        await _run_quiz_task_inner(task_id, req, user_id, run.run_id)
+
+
+async def _run_quiz_task_inner(
+    task_id: str,
+    req: QuizGenerateRequest,
+    user_id: Optional[int],
+    run_id: str,
+) -> None:
     try:
         await task_repository.update_task_status(task_id, "running")
         logger.info("quiz_task_started", task_id=task_id)
@@ -171,17 +211,19 @@ async def _run_quiz_task(
         search_context = await _fetch_context(req, user_id)
 
         # 生成题目
-        quiz_output = await generate_quiz(
-            user_input=req.user_input,
-            question_count=req.question_count,
-            difficulty=req.difficulty,
-            search_context=search_context,
-        )
+        with stage("quiz_generate"):
+            quiz_output = await generate_quiz(
+                user_input=req.user_input,
+                question_count=req.question_count,
+                difficulty=req.difficulty,
+                search_context=search_context,
+            )
 
         quiz_id = f"quiz_{uuid.uuid4().hex[:12]}"
 
         # 按需为题目生成配图（不影响出题主流程）
-        image_notice = await _maybe_generate_images(quiz_output, quiz_id, user_id, req.generate_images)
+        with stage("image_generate"):
+            image_notice = await _maybe_generate_images(quiz_output, quiz_id, user_id, req.generate_images)
 
         # 有登录态时落库
         if user_id is not None:
@@ -193,6 +235,8 @@ async def _run_quiz_task(
                     summary=quiz_output.summary,
                     user_input=req.user_input,
                     questions_json=[q.model_dump() for q in quiz_output.questions],
+                    prompt_version=prompt_version_tag(),
+                    trace_id=run_id,
                 )
             except Exception as e:
                 logger.error("quiz_session_save_failed", task_id=task_id, error=str(e))
