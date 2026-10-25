@@ -23,6 +23,7 @@ from app.services import rag_service
 from app.services import image_service
 from app.services.search_service import fetch_knowledge_context
 from app.observability import current_run, start_run, stage
+from app.observability.tracing import trace_user_id
 from app.prompts.registry import prompt_version_tag
 
 logger = structlog.get_logger()
@@ -111,6 +112,7 @@ async def handle_quiz_generate(
         question_count=req.question_count,
         difficulty=req.difficulty,
         prompt_version=prompt_version_tag(),
+        user_id=trace_user_id(user_id),
     ) as run:
         return await _generate_and_persist(req, user_id, run.run_id)
 
@@ -210,6 +212,7 @@ async def _run_quiz_task(
         question_count=req.question_count,
         difficulty=req.difficulty,
         prompt_version=prompt_version_tag(),
+        user_id=trace_user_id(user_id),
     ) as run:
         await _run_quiz_task_inner(task_id, req, user_id, run.run_id)
 

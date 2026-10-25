@@ -7,6 +7,7 @@ import structlog
 from app.core.exceptions import ReportGenerationError
 from app.llm.report_chain import generate_report
 from app.observability import stage, start_run
+from app.observability.tracing import trace_user_id
 from app.models.report import ReportGenerateRequest, ReportGenerateResponse
 from app.services.scoring_service import compute_score_summary
 from app.repositories import quiz_repository, user_repository
@@ -21,7 +22,7 @@ async def handle_report_generate(
     score_summary = compute_score_summary(req.answer_records)
 
     try:
-        with start_run("report", quiz_id=req.quiz_id), stage("report_generate"):
+        with start_run("report", quiz_id=req.quiz_id, user_id=trace_user_id(user_id)), stage("report_generate"):
             report_output = await generate_report(
                 topic=req.topic,
                 questions=req.questions,

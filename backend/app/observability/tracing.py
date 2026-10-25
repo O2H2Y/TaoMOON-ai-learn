@@ -38,6 +38,11 @@ def _langfuse_ready() -> bool:
         return False
 
 
+def trace_user_id(user_id: int | None) -> str:
+    """链路记录里使用的用户标识：只用内部数字 ID，不写 openid、昵称等个人信息；未登录记为 anonymous。"""
+    return f"u_{user_id}" if user_id is not None else "anonymous"
+
+
 def flush_tracing() -> None:
     """把缓冲中的 trace 发出去。短进程（评测脚本）退出前、服务关闭时调用。"""
     if not _langfuse_ready():
@@ -88,6 +93,9 @@ def build_langchain_config(
     if record is not None:
         metadata["langfuse_session_id"] = record.run_id
         metadata["run_id"] = record.run_id
+        user = record.metadata.get("user_id")
+        if user:
+            metadata["langfuse_user_id"] = user
         tags.append(f"kind:{record.kind}")
     config["metadata"] = metadata
     config["tags"] = tags
