@@ -366,6 +366,7 @@ export interface QuizData {
   summary: string
   questions: Question[]
   image_notice?: string | null
+  search_notice?: string | null
 }
 
 export interface QuizTaskStatus {

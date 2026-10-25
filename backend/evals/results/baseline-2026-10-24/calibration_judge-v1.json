@@ -1,0 +1,825 @@
+{
+ "tag": "baseline-2026-10-24",
+ "judge_version": "judge-v1",
+ "annotator": "AI 辅助标注（用户确认 2026-10-25；带来源依据，非纯人工 GT，记为 silver+）",
+ "n_items": 60,
+ "strata_n": {
+  "flagged": 30,
+  "random": 30
+ },
+ "strata_weight": {
+  "flagged": 3.3,
+  "random": 27.6
+ },
+ "note": "按 flagged/random 分层权重还原到全部 baseline 题；human_rate 为人工判定的总体问题率估计",
+ "dims": {
+  "bad": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 9,
+    "fp": 21,
+    "fn": 3,
+    "tn": 27
+   },
+   "human_rate": 0.12135922330097085,
+   "judge_rate": 0.1067961165048543,
+   "agreement": 0.8359223300970875,
+   "precision": 0.3000000000000001,
+   "recall": 0.264,
+   "kappa": 0.18867396877184875,
+   "ci95": {
+    "human_rate": [
+     0.0320388349514563,
+     0.22491909385113262
+    ],
+    "agreement": [
+     0.728802588996764,
+     0.925242718446602
+    ],
+    "precision": [
+     0.1333333333333334,
+     0.4666666666666667
+    ],
+    "recall": [
+     0.10679611650485435,
+     1.0
+    ]
+   }
+  },
+  "answer_wrong": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 2,
+    "fp": 8,
+    "fn": 3,
+    "tn": 47
+   },
+   "human_rate": 0.04401294498381876,
+   "judge_rate": 0.03559870550161811,
+   "agreement": 0.9346278317152104,
+   "precision": 0.19999999999999998,
+   "recall": 0.16176470588235292,
+   "kappa": 0.14521651009284878,
+   "ci95": {
+    "human_rate": [
+     0.0035598705501618147,
+     0.1106796116504855
+    ],
+    "agreement": [
+     0.8644012944983818,
+     0.9786407766990292
+    ],
+    "precision": [
+     0.0,
+     0.5
+    ],
+    "recall": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  "not_unique": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 3,
+    "fp": 6,
+    "fn": 5,
+    "tn": 46
+   },
+   "human_rate": 0.08090614886731388,
+   "judge_rate": 0.0320388349514563,
+   "agreement": 0.9084142394822007,
+   "precision": 0.3333333333333333,
+   "recall": 0.13199999999999998,
+   "kappa": 0.15010059188850405,
+   "ci95": {
+    "human_rate": [
+     0.014239482200647255,
+     0.17022653721682862
+    ],
+    "agreement": [
+     0.8155339805825241,
+     0.978640776699029
+    ],
+    "precision": [
+     0.0,
+     0.6666666666666667
+    ],
+    "recall": [
+     0.0,
+     0.7142857142857142
+    ]
+   }
+  },
+  "expl_error": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 6,
+    "fp": 17,
+    "fn": 3,
+    "tn": 34
+   },
+   "human_rate": 0.0844660194174757,
+   "judge_rate": 0.08187702265372163,
+   "agreement": 0.8763754045307444,
+   "precision": 0.2608695652173914,
+   "recall": 0.25287356321839083,
+   "kappa": 0.18940745532532,
+   "ci95": {
+    "human_rate": [
+     0.017799352750809058,
+     0.1773462783171521
+    ],
+    "agreement": [
+     0.7870550161812297,
+     0.943042071197411
+    ],
+    "precision": [
+     0.09090909090909095,
+     0.4545454545454546
+    ],
+    "recall": [
+     0.0738255033557047,
+     1.0
+    ]
+   }
+  },
+  "hallucination": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 2,
+    "fp": 21,
+    "fn": 1,
+    "tn": 36
+   },
+   "human_rate": 0.03689320388349514,
+   "judge_rate": 0.08187702265372161,
+   "agreement": 0.8954692556634305,
+   "precision": 0.08695652173913047,
+   "recall": 0.19298245614035084,
+   "kappa": 0.07272382672486333,
+   "ci95": {
+    "human_rate": [
+     0.0,
+     0.10355987055016182
+    ],
+    "agreement": [
+     0.8216828478964402,
+     0.9394822006472492
+    ],
+    "precision": [
+     0.0,
+     0.22222222222222224
+    ],
+    "recall": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  "off_topic": {
+   "n": 60,
+   "raw_confusion": {
+    "tp": 0,
+    "fp": 6,
+    "fn": 0,
+    "tn": 54
+   },
+   "human_rate": 0.0,
+   "judge_rate": 0.021359223300970873,
+   "agreement": 0.9786407766990292,
+   "precision": 0.0,
+   "recall": null,
+   "kappa": 0.0,
+   "ci95": {
+    "human_rate": [
+     0.0,
+     0.0
+    ],
+    "agreement": [
+     0.9608414239482201,
+     0.9928802588996763
+    ],
+    "precision": [
+     0.0,
+     0.0
+    ],
+    "recall": null
+   }
+  }
+ },
+ "by_stratum": {
+  "flagged": {
+   "bad": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 9,
+     "fp": 21,
+     "fn": 0,
+     "tn": 0
+    },
+    "human_rate": 0.3000000000000001,
+    "judge_rate": 1.0,
+    "agreement": 0.3000000000000001,
+    "precision": 0.3000000000000001,
+    "recall": 1.0,
+    "kappa": 0.0
+   },
+   "answer_wrong": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 2,
+     "fp": 8,
+     "fn": 2,
+     "tn": 18
+    },
+    "human_rate": 0.13333333333333336,
+    "judge_rate": 0.3333333333333334,
+    "agreement": 0.6666666666666665,
+    "precision": 0.19999999999999998,
+    "recall": 0.5,
+    "kappa": 0.117647058823529
+   },
+   "not_unique": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 3,
+     "fp": 6,
+     "fn": 3,
+     "tn": 18
+    },
+    "human_rate": 0.20000000000000004,
+    "judge_rate": 0.3000000000000001,
+    "agreement": 0.7000000000000001,
+    "precision": 0.3333333333333333,
+    "recall": 0.5,
+    "kappa": 0.21052631578947387
+   },
+   "expl_error": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 6,
+     "fp": 17,
+     "fn": 1,
+     "tn": 6
+    },
+    "human_rate": 0.2333333333333334,
+    "judge_rate": 0.7666666666666665,
+    "agreement": 0.4000000000000001,
+    "precision": 0.2608695652173914,
+    "recall": 0.8571428571428571,
+    "kappa": 0.06574394463667813
+   },
+   "hallucination": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 2,
+     "fp": 21,
+     "fn": 0,
+     "tn": 7
+    },
+    "human_rate": 0.06666666666666668,
+    "judge_rate": 0.7666666666666665,
+    "agreement": 0.3000000000000001,
+    "precision": 0.08695652173913047,
+    "recall": 1.0,
+    "kappa": 0.042553191489361604
+   },
+   "off_topic": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 6,
+     "fn": 0,
+     "tn": 24
+    },
+    "human_rate": 0.0,
+    "judge_rate": 0.2000000000000001,
+    "agreement": 0.7999999999999999,
+    "precision": 0.0,
+    "recall": null,
+    "kappa": 0.0
+   }
+  },
+  "random": {
+   "bad": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 3,
+     "tn": 27
+    },
+    "human_rate": 0.09999999999999996,
+    "judge_rate": 0.0,
+    "agreement": 0.9,
+    "precision": null,
+    "recall": 0.0,
+    "kappa": 0.0
+   },
+   "answer_wrong": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 1,
+     "tn": 29
+    },
+    "human_rate": 0.03333333333333332,
+    "judge_rate": 0.0,
+    "agreement": 0.9666666666666667,
+    "precision": null,
+    "recall": 0.0,
+    "kappa": 0.0
+   },
+   "not_unique": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2,
+     "tn": 28
+    },
+    "human_rate": 0.06666666666666664,
+    "judge_rate": 0.0,
+    "agreement": 0.9333333333333333,
+    "precision": null,
+    "recall": 0.0,
+    "kappa": 0.0
+   },
+   "expl_error": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2,
+     "tn": 28
+    },
+    "human_rate": 0.06666666666666664,
+    "judge_rate": 0.0,
+    "agreement": 0.9333333333333333,
+    "precision": null,
+    "recall": 0.0,
+    "kappa": 0.0
+   },
+   "hallucination": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 1,
+     "tn": 29
+    },
+    "human_rate": 0.03333333333333332,
+    "judge_rate": 0.0,
+    "agreement": 0.9666666666666667,
+    "precision": null,
+    "recall": 0.0,
+    "kappa": 0.0
+   },
+   "off_topic": {
+    "n": 30,
+    "raw_confusion": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "tn": 30
+    },
+    "human_rate": 0.0,
+    "judge_rate": 0.0,
+    "agreement": 1.0,
+    "precision": null,
+    "recall": null,
+    "kappa": null
+   }
+  }
+ },
+ "distractor": {
+  "n": 49,
+  "exact_agree": 0.5918367346938775,
+  "mae": 0.6122448979591837,
+  "human_mean": 2.4285714285714284,
+  "judge_mean": 2.510204081632653
+ },
+ "disagreements": [
+  {
+   "uid": "c01",
+   "stratum": "random",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": false,
+   "solver_agrees": true,
+   "judge_issue": "",
+   "human_note": "A项『口温前10分钟』与教材30分钟不符，答案应为CD；讲解同错。"
+  },
+  {
+   "uid": "c02",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中未提及Gemini 4 Argon支持100万输出token，也未提及其发布日期为9月30日，题目关键信息均无法从资料中核实。",
+   "human_note": "官方博客确认2026-09-30发布、1M输出（前代64K）；讲解中64K/128K归属正确。"
+  },
+  {
+   "uid": "c03",
+   "stratum": "flagged",
+   "dims": [
+    "not_unique",
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中未提及“SWA Bounded Replay”、“CSA2”和“DSpark”这些具体技术术语，讲解内容无法从提供的资料中核实，疑似模型幻觉或依赖未提供的内部知识。",
+   "human_note": "ABC为V4.1-Flash特性，答案成立；讲解把它们说成『DeepSeek V4引入』，与V4预览版（CSA+HCA）不符；D凑数。"
+  },
+  {
+   "uid": "c04",
+   "stratum": "random",
+   "dims": [
+    "expl_error"
+   ],
+   "human_bad": true,
+   "pipeline_flag": false,
+   "solver_agrees": true,
+   "judge_issue": "",
+   "human_note": "答案B正确；讲解把『A、B独立』列为P(A|B)=P(B|A)的条件，属错误。"
+  },
+  {
+   "uid": "c07",
+   "stratum": "flagged",
+   "dims": [
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "讲解中提到的'Engram模块参数量'在参考资料中未提及，属于编造信息；且题目问的是V4系列，资料主要指向V4.1 Flash的具体参数，虽数值匹配但需严谨区分版本。",
+   "human_note": "数字与官方一致（V4.1-Flash）；讲解把CED/552B归为『DeepSeek V4』，版本归属不准。"
+  },
+  {
+   "uid": "c08",
+   "stratum": "flagged",
+   "dims": [],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "计算正确≈31.6%，干扰项设计合理。"
+  },
+  {
+   "uid": "c11",
+   "stratum": "flagged",
+   "dims": [
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "题目和讲解存在严重逻辑混乱和自我矛盾。参考资料仅提及Gemini 4 Argon于9月30日发布，未提及Claude Fable 5.1或GPT-6 Astra的9月发布日期。讲解中试图修正答案但逻辑不通，且依赖大量未在资料中出现的细节。",
+   "human_note": "Gemini 4 Argon 9月30日已发布，C也对，答案ABD错误；讲解泄露出题推理过程、自相矛盾。"
+  },
+  {
+   "uid": "c14",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目考查生成器，但提供的参考资料（Python类教程章节）中未包含生成器相关内容，属于超纲且脱离给定资料；此外，虽然生成器知识本身正确，但不符合‘根据这篇文章出题’的要求。",
+   "human_note": "与文档9.9节逐句吻合：yield、自动创建__iter__/__next__、自动保存局部状态、终结时自动引发StopIteration；C为原文反说。"
+  },
+  {
+   "uid": "c15",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料未提及 MessagesState 的 reducer 实现细节（add_messages），且该知识点属于 LangChain/LangGraph 底层实现而非 ReAct 工作原理的核心逻辑，超出资料范围。",
+   "human_note": "官方文档：MessagesState 使用 add_messages reducer，新消息追加、同ID消息更新；其余选项非LangGraph内置reducer。"
+  },
+  {
+   "uid": "c17",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "讲解中提到的'约5.5小时'出舱时长在参考资料中未提及，属于编造细节。",
+   "human_note": "官方：8月28日13:59完成约5.5小时出舱，太阳翼舱外维修+空间碎片防护装置安装，第二次太阳翼维修；D项明显凑数。"
+  },
+  {
+   "uid": "c18",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中不存在“关键趋势与技术要点”章节，也未提及开源模型在旧基准上追平闭源模型的结论，讲解内容完全编造。",
+   "human_note": "说法有据：DeepSeek V4 模型卡 SWE Verified 开源80.6 vs Opus-4.6 80.8/Gemini-3.1-Pro 80.6；但题干所称『资料』原句在可见G列（截断）中未出现，搜索也未找到原文。"
+  },
+  {
+   "uid": "c19",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "讲解中提到的具体技术细节（如mHC、Muon优化器、FP4/FP8混合精度等）在提供的参考资料中完全未提及，属于无法核实的幻觉或依赖外部知识，且多选题干扰项质量低。",
+   "human_note": "D『动态门控网络（两阶段训练改善负载不均）』在V4技术报告/模型卡中不存在，正确答案应为A,B,C；且漏掉真正核心的CSA+HCA混合注意力。"
+  },
+  {
+   "uid": "c21",
+   "stratum": "flagged",
+   "dims": [],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "2026-06-11 揭幕战墨西哥2-0南非在阿兹特克体育场举行，阿兹特克成为首座举办三届世界杯的球场。"
+  },
+  {
+   "uid": "c23",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料虽提及女工童工，但未提及“纺织业女工占比一半”、“手部更灵活”及历史学家Jane Humphries的具体估计数据，讲解依赖了资料外的信息。",
+   "human_note": "1851年普查纺织业女性占49%、1833工厂女工57%；女性工资远低于男性、灵巧性有文献；Humphries 15%童工估计属实。『主要原因』表述略简化。"
+  },
+  {
+   "uid": "c24",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "D错误：水汽含量随温度显著变化且正在增加（约7%/°C），并非『基本恒定』；B、C为AR4/TAR旧值，AR6为CH4 27–30、N2O 273。答案应为A,B,C（且B/C有过时争议）。"
+  },
+  {
+   "uid": "c25",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中完全未提及成年男性平均身高从1.73米降至1.67米的数据，题干和讲解均属于严重的幻觉。",
+   "human_note": "答案B合理；1.73→1.67米数字可追溯到中文维基（该条目自标『疑欠准确』，且原文说的是『工业革命前夕的18–19世纪』，NBER原研究称最低点在17–18世纪、早于工业化），题干把下降归因于『工业革命时期』有偏差；D/C偏凑数。"
+  },
+  {
+   "uid": "c26",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目基于参考资料中不存在的 'AI Agent Harness' 概念，无法依据提供的资料判断正误。",
+   "human_note": "多方来源称 harness 可在不重训模型的情况下扩展能力（如接入视觉模块、代码执行），判断正确；少数来源强调『权重不变、模型本身不变强』，属措辞层面差异。"
+  },
+  {
+   "uid": "c27",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "讲解中引用的“IDC研究，到2028年约85%的容器仍将运行在虚拟机内”这一具体数据和来源在提供的参考资料中不存在，且属于无法通过常识直接核实的特定统计预测，构成幻觉。",
+   "human_note": "容器与VM非互斥，答案B正确；讲解中IDC『2028年约85%容器运行在VM内』已在IDC白皮书核实。"
+  },
+  {
+   "uid": "c29",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目基于参考资料中不存在的 'AI Agent Harness' 概念，讲解中的组成成分无法从提供的资料中核实。",
+   "human_note": "系统提示词、工具层、沙箱均为harness组成，显卡驱动不是，D正确；题目偏易。"
+  },
+  {
+   "uid": "c31",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中未提及 'AI Agent Harness' 概念，且该题偏离了资料核心主题（Harness.io 平台及通用词义），讲解内容无法依据提供的资料核实。",
+   "human_note": "B为Agent Harness标准定义；C『马具』为字面义，明显凑数（虽有辨析词义之意），A/D尚有一定迷惑性（D易与评估harness混淆）。"
+  },
+  {
+   "uid": "c33",
+   "stratum": "flagged",
+   "dims": [
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "讲解中提到的具体价格（输入$0.30、输出$1.20）在提供的参考资料中完全不存在，属于严重幻觉；资料仅提及峰谷定价机制和人民币计价（CNY 5 per 1,000 calls for Search/Fetch），未提供Token单价。",
+   "human_note": "1M上下文、闲时半价均经官方文档核实，判断正确；但讲解把V4.1-Flash（deepseek-flash）的峰值价$0.30/$1.20和『max_tokens≥256K』当作整个V4系列的数据，V4-Pro峰值实为$1.32/$3.96，存在以偏概全。"
+  },
+  {
+   "uid": "c38",
+   "stratum": "flagged",
+   "dims": [],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "官方教程原文：类成员通常为public、所有成员函数都为virtual；内置类型可作基类，故B对、D错。"
+  },
+  {
+   "uid": "c41",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "参考资料仅提及DeepSeek-V4.1-Flash-1017于10月17日发布，未提及“帕累托改进”这一官方表述，且讲解中编造了其他选项的具体发布日期和参数对比，属于严重幻觉。",
+   "human_note": "DeepSeek官方10/17发布V4.1-Flash-1017并称性能-成本帕累托改进；V4.1-Flash为9/10发布，讲解属实。G列未含该事实，靠官方页核实。"
+  },
+  {
+   "uid": "c42",
+   "stratum": "flagged",
+   "dims": [
+    "not_unique",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中未提及冰立方建成的具体年份（2011年）及发现高能中微子的具体年份（2013年），判断题的依据无法从提供的资料中核实。",
+   "human_note": "诺奖官方科普称IceCube 2011年达到完整规模、2013年报告首批宇宙中微子证据，题述大体成立；但IceCube官方称2010年12月建成，且2013年为『证据』而非确证，判断存在歧义。"
+  },
+  {
+   "uid": "c43",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "讲解存在严重事实错误：声称程序性记忆巩固主要与REM相关而排除深睡眠，这与主流神经科学共识（深睡眠对程序性/运动记忆巩固至关重要）相悖；且参考资料未支持此排他性观点。",
+   "human_note": "主流综述：SWS 与生长激素分泌、陈述性记忆（海马-新皮层对话）、Aβ清除相关；程序性记忆主要与REM相关（但亦有N2/SWS参与的证据）。"
+  },
+  {
+   "uid": "c47",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目考察的'管理多个客户端、控制连接权限与用户授权'并非参考资料中MCP Host的定义（资料仅称Host为AI应用环境），且该描述更接近商业平台功能而非协议标准组件，属于幻觉或超纲内容。",
+   "human_note": "MCP 规范：Host 创建并管理多个client、控制连接权限与生命周期、处理用户授权，答案C正确；D JSON-RPC 是协议非组件，偏凑数。"
+  },
+  {
+   "uid": "c48",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "expl_error",
+    "hallucination",
+    "off_topic"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "参考资料中未包含任何关于“Mercury 金融科技公司”的信息，题目内容完全脱离提供的资料且属于幻觉生成。",
+   "human_note": "Mercury Technologies 确为面向初创与小企业的金融科技公司，答案B对；但题干称『根据资料』而G列（截断部分）只有水银/水星内容，且A/C/D均明显凑数。"
+  },
+  {
+   "uid": "c51",
+   "stratum": "random",
+   "dims": [
+    "not_unique"
+   ],
+   "human_bad": true,
+   "pipeline_flag": false,
+   "solver_agrees": true,
+   "judge_issue": "",
+   "human_note": "B（空数组）是标准答案；但 [null]/[undefined] 是常量依赖，按 Object.is 比较永不变化，同样只在挂载时执行一次，C、D 实际也能达到效果，唯一性不足。"
+  },
+  {
+   "uid": "c52",
+   "stratum": "flagged",
+   "dims": [
+    "not_unique"
+   ],
+   "human_bad": true,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "按宪法第9、10条四项均可归为国家所有，答案成立；但森林存在“法律规定属于集体所有”的例外，题干未加限定，C 有歧义；且四项全对无干扰项。"
+  },
+  {
+   "uid": "c53",
+   "stratum": "flagged",
+   "dims": [],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": false,
+   "judge_issue": "",
+   "human_note": "神二十一乘组张陆（指令长）、武飞、张洪章，2025-10-31发射，驻留210天创纪录（载人航天官网）；陈冬/陈中瑞为神二十、朱杨柱为神二十三指令长，讲解全部属实。"
+  },
+  {
+   "uid": "c56",
+   "stratum": "flagged",
+   "dims": [
+    "expl_error",
+    "hallucination"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目涉及的 'MessagesState'、'add_messages reducer' 及 '子类化添加字段' 等具体实现细节在提供的参考资料中完全未提及，无法依据给定资料验证其正确性，属于超出资料范围的知识。",
+   "human_note": "A/B/D 与 LangGraph 官方文档及 Gemini 官方 ReAct 示例一致，C 错误；唯一干扰项 C 用“只能…不能”绝对化表述，较易排除。"
+  },
+  {
+   "uid": "c58",
+   "stratum": "flagged",
+   "dims": [
+    "answer_wrong",
+    "not_unique",
+    "expl_error"
+   ],
+   "human_bad": false,
+   "pipeline_flag": true,
+   "solver_agrees": true,
+   "judge_issue": "题目表述有误且答案错误。郑和第一次下西洋的终点通常认为是古里（Calicut），但参考资料明确指出前三次主要在南海、南洋群岛和南印度洋一带，并未强调古里是唯一的“终极”目的地且后续必到；更重要的是，历史学界公认第一次下西洋最远到达的是古里，但选项A说是“终极目的地”容易产生歧义（因为后来去得更远）。然而，最大的问题在于讲解中说“此后七次必到古里”，这与史实不符（第七次是否到达古里有争议，且每次航线略有不同）。此外，根据参考资料，第一次下西洋到达了爪哇、苏门答腊、锡兰、古里等。如果问“最远到达”，古里是合理的。但如果问“终极目的地”，通常指该次航行的最远点。此题主要问题在于讲解中的绝对化表述以及选项设计的严谨性不足，且参考资料中并未明确支持“第一次...终极目的地是古里”这一排他性说法作为唯一考点，反而强调了航线的复杂性。更关键的是，很多史料认为第一次最远只到印度西海岸，但具体是否仅为古里存在细微差别。不过，对比其他选项，A相对最接近。但是，讲解中“此后七次必到古里”是错误的，例如第二次主要去了暹罗、爪哇等，不一定每次都深入印度。因此判定讲解不忠实。",
+   "human_note": "社科院万明文章明确“第一次下西洋的终极目的地是古里（卡利卡特/科泽科德）”，此后每次必到，第四次以后延伸至波斯湾、东非，讲解几乎逐句吻合。"
+  }
+ ]
+}

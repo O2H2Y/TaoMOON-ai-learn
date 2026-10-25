@@ -6,6 +6,8 @@ import time
 import structlog
 
 from app.core.config import get_settings
+from app.observability import ContextResult, build_langchain_config, record_context, record_llm_usage, stage
+from app.observability.run_context import extract_agent_trace
 from app.prompts.search_prompt import SEARCH_AGENT_SYSTEM_PROMPT
 
 logger = structlog.get_logger()
@@ -19,6 +21,8 @@ def _build_agent():
     from langchain_core.callbacks import AsyncCallbackHandler
     from langgraph.prebuilt import create_react_agent
     from langchain_openai import ChatOpenAI
+
+    from app.llm.langchain_factory import deepseek_extra_body
     from langchain_tavily import TavilyExtract, TavilySearch
 
     settings = get_settings()
@@ -92,6 +96,7 @@ def _build_agent():
         base_url=settings.deepseek_base_url,
         api_key=settings.deepseek_api_key,
         temperature=0.1,
+        extra_body=deepseek_extra_body(),
         callbacks=[tool_logger],
     )
 
@@ -113,17 +118,33 @@ async def fetch_knowledge_context(user_input: str) -> str:
     Returns:
         知识摘要字符串，失败时返回空字符串
     """
+    result = await fetch_knowledge_context_result(user_input)
+    return result.summary
+
+
+async def fetch_knowledge_context_result(user_input: str) -> ContextResult:
+    """与 fetch_knowledge_context 行为一致，但返回包含原始证据的 ContextResult。
+
+    返回前会写入当前 RunRecord（若有），供离线评测计算 faithfulness / 截断损失 / 失败归因。
+    """
+    ctx = await _fetch(user_input)
+    record_context(ctx)
+    return ctx
+
+
+async def _fetch(user_input: str) -> ContextResult:
     settings = get_settings()
 
     # 配置开关检查
     if not settings.enable_web_search:
         logger.info("web_search_disabled")
-        return ""
+        return ContextResult(source="web", status="disabled", max_length=MAX_CONTEXT_LENGTH)
 
     if not settings.tavily_api_key:
         logger.warning("tavily_api_key_not_configured")
-        return ""
+        return ContextResult(source="web", status="disabled", max_length=MAX_CONTEXT_LENGTH, error="no_tavily_key")
 
+    t1 = time.monotonic()
     try:
         logger.info("search_agent_starting", user_input=user_input[:100])
 
@@ -133,13 +154,18 @@ async def fetch_knowledge_context(user_input: str) -> str:
 
         # 使用 asyncio.wait_for 设置超时
         t1 = time.monotonic()
-        result = await asyncio.wait_for(
-            agent.ainvoke(
-                {"messages": [{"role": "user", "content": user_input}]},
-                config={"recursion_limit": 10, "callbacks": [tool_logger]},
-            ),
-            timeout=AGENT_TIMEOUT_SECONDS,
-        )
+        with stage("web_search"):
+            result = await asyncio.wait_for(
+                agent.ainvoke(
+                    {"messages": [{"role": "user", "content": user_input}]},
+                    config=build_langchain_config(
+                        "web_search_agent",
+                        extra_callbacks=[tool_logger],
+                        recursion_limit=10,
+                    ),
+                ),
+                timeout=AGENT_TIMEOUT_SECONDS,
+            )
         elapsed = round((time.monotonic() - t1) * 1000)
 
         # 打印 Agent 完整消息链路用于调试
@@ -159,27 +185,62 @@ async def fetch_knowledge_context(user_input: str) -> str:
                 index=i,
                 type=msg_type,
                 content_preview=content_preview,
-                tool_calls=len(tool_calls) if tool_calls else 0,
+                tool_calls=len(tool_calls) if isinstance(tool_calls, list) else 0,
+            )
+
+        record_llm_usage("web_search_agent", settings.deepseek_model, messages)
+        tool_calls, evidence = extract_agent_trace(messages)
+        tool_errors = sum(1 for e in evidence if e.get("is_error"))
+
+        # 所有工具调用都报错：Agent 的最终回复只是"没找到资料"之类的话，不是真实资料。
+        # 判为失败，不把它当参考资料喂给出题模型（出题降级为不联网，与未开启搜索时一致）。
+        if evidence and tool_errors == len(evidence):
+            first_err = str(evidence[0].get("content", ""))[:300]
+            logger.warning("search_all_tools_failed", tool_errors=tool_errors, first_error=first_err)
+            return ContextResult(
+                source="web", status="error", max_length=MAX_CONTEXT_LENGTH,
+                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed,
+                tool_errors=tool_errors, error=f"all_tool_calls_failed: {first_err}",
             )
 
         # 提取 Agent 最终回复
-        content = result["messages"][-1].content
-        if not content:
+        raw = result["messages"][-1].content
+        if not raw:
             logger.warning("search_agent_empty_response")
-            return ""
+            return ContextResult(
+                source="web", status="empty", max_length=MAX_CONTEXT_LENGTH,
+                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed, tool_errors=tool_errors,
+            )
 
+        content = raw
+        truncated = False
         # 截断到最大长度
         if len(content) > MAX_CONTEXT_LENGTH:
             content = content[:MAX_CONTEXT_LENGTH]
-            logger.info("search_context_truncated", original_length=len(result["messages"][-1].content))
+            truncated = True
+            logger.info("search_context_truncated", original_length=len(raw))
 
         logger.info("search_context_fetched", length=len(content))
-        return content
+        return ContextResult(
+            source="web",
+            status="ok",
+            summary=content,
+            raw_summary_length=len(raw),
+            truncated=truncated,
+            max_length=MAX_CONTEXT_LENGTH,
+            tool_calls=tool_calls,
+            evidence=evidence,
+            elapsed_ms=elapsed,
+            tool_errors=tool_errors,
+        )
 
     except asyncio.TimeoutError:
-        elapsed = round((time.monotonic() - t1) * 1000) if 't1' in dir() else -1
+        elapsed = round((time.monotonic() - t1) * 1000)
         logger.warning("search_agent_timeout", timeout=AGENT_TIMEOUT_SECONDS, elapsed_ms=elapsed, user_input=user_input[:100])
-        return ""
+        return ContextResult(source="web", status="timeout", max_length=MAX_CONTEXT_LENGTH, elapsed_ms=elapsed)
     except Exception as e:
         logger.warning("search_agent_error", error=str(e), error_type=type(e).__name__, user_input=user_input[:100])
-        return ""
+        return ContextResult(
+            source="web", status="error", max_length=MAX_CONTEXT_LENGTH,
+            elapsed_ms=round((time.monotonic() - t1) * 1000), error=f"{type(e).__name__}: {e}"[:500],
+        )

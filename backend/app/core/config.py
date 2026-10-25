@@ -9,7 +9,10 @@ class Settings(BaseSettings):
     # DeepSeek
     deepseek_api_key: str = "sk-xxx"
     deepseek_base_url: str = "https://api.deepseek.com"
-    deepseek_model: str = "deepseek-chat"
+    # deepseek-flash = 当前便宜档（DeepSeek-V4.1-Flash）；旧名 deepseek-chat 官方已宣布下线
+    deepseek_model: str = "deepseek-flash"
+    # deepseek-flash 默认开启思考模式；出题/报告/搜索 agent 都显式关闭（更快更省，且 agent 工具调用无需回传 reasoning_content）
+    deepseek_thinking: str = "disabled"
 
     # Tavily (Web Search)
     tavily_api_key: str = ""
@@ -94,6 +97,13 @@ class Settings(BaseSettings):
 
     # Log
     log_level: str = "INFO"
+
+    # 可观测性：Langfuse tracing（未配置 key 时自动关闭，不影响业务）
+    enable_tracing: bool = True
+    langfuse_public_key: str = ""
+    langfuse_secret_key: str = ""
+    langfuse_host: str = "https://cloud.langfuse.com"
+    langfuse_environment: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
