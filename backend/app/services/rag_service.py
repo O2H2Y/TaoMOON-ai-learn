@@ -48,6 +48,8 @@ def _build_agent(user_id: int, doc_id: str):
     from langgraph.prebuilt import create_react_agent
     from langchain_openai import ChatOpenAI
 
+    from app.llm.langchain_factory import deepseek_extra_body
+
     settings = get_settings()
 
     tools = [_build_knowledge_base_tool(user_id, doc_id)]
@@ -89,6 +91,7 @@ def _build_agent(user_id: int, doc_id: str):
         base_url=settings.deepseek_base_url,
         api_key=settings.deepseek_api_key,
         temperature=0.1,
+        extra_body=deepseek_extra_body(),
     )
 
     agent = create_react_agent(

@@ -21,6 +21,8 @@ def _build_agent():
     from langchain_core.callbacks import AsyncCallbackHandler
     from langgraph.prebuilt import create_react_agent
     from langchain_openai import ChatOpenAI
+
+    from app.llm.langchain_factory import deepseek_extra_body
     from langchain_tavily import TavilyExtract, TavilySearch
 
     settings = get_settings()
@@ -94,6 +96,7 @@ def _build_agent():
         base_url=settings.deepseek_base_url,
         api_key=settings.deepseek_api_key,
         temperature=0.1,
+        extra_body=deepseek_extra_body(),
         callbacks=[tool_logger],
     )
 

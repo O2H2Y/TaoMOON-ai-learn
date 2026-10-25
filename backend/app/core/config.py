@@ -9,7 +9,10 @@ class Settings(BaseSettings):
     # DeepSeek
     deepseek_api_key: str = "sk-xxx"
     deepseek_base_url: str = "https://api.deepseek.com"
-    deepseek_model: str = "deepseek-chat"
+    # deepseek-flash = 当前便宜档（DeepSeek-V4.1-Flash）；旧名 deepseek-chat 官方已宣布下线
+    deepseek_model: str = "deepseek-flash"
+    # deepseek-flash 默认开启思考模式；出题/报告/搜索 agent 都显式关闭（更快更省，且 agent 工具调用无需回传 reasoning_content）
+    deepseek_thinking: str = "disabled"
 
     # Tavily (Web Search)
     tavily_api_key: str = ""

@@ -105,6 +105,8 @@ async def test_quiz_generate_without_search_context(mock_quiz_output):
 @pytest.mark.asyncio
 async def test_generate_quiz_passes_search_context_to_prompt():
     """generate_quiz 应将 search_context 正确传入 prompt 模板"""
+    from langchain_core.messages import AIMessage
+
     mock_llm_response = MagicMock()
     mock_llm_response.content = '''{
         "title": "测试",
@@ -119,7 +121,10 @@ async def test_generate_quiz_passes_search_context_to_prompt():
     }'''
 
     mock_chain = MagicMock()
-    mock_chain.ainvoke = AsyncMock(return_value=mock_llm_response)
+    # with_structured_output(include_raw=True) 的输出形态；这里模拟模型没走工具调用、正文给 JSON 的兜底路径
+    mock_chain.ainvoke = AsyncMock(
+        return_value={"raw": AIMessage(content=mock_llm_response.content), "parsed": None, "parsing_error": None}
+    )
 
     with (
         patch("app.llm.quiz_chain.get_chat_model") as mock_get_model,
@@ -136,6 +141,7 @@ async def test_generate_quiz_passes_search_context_to_prompt():
 
         result = await generate_quiz(
             user_input="Harness",
+            question_count=1,
             search_context="Harness 是一个 CD 平台",
         )
 
