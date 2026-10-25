@@ -97,10 +97,161 @@ def make(tag: str, out: str, n_flag: int = 30, n_rand: int = 30) -> None:
     print(f"wrote {out}: {len(pick)} items (flagged pool {len(fl)}, ok pool {len(ok)})")
 
 
+# ---------------------------------------------------------------- score
+
+YES = {"y", "yes", "是", "true", "1"}
+NO = {"n", "no", "否", "false", "0"}
+
+# 维度：(名称, 人工取值函数, judge 取值函数)；值为 True 表示"有问题"，None 表示不可比
+def _yn(v):
+    v = str(v).strip().lower() if v is not None else ""
+    return True if v in YES else False if v in NO else None
+
+
+def human_labels(row: dict) -> dict:
+    ac = str(row["answer_correct"] or "").strip().lower()
+    h = {
+        "answer_wrong": None if ac in ("unsure", "") else ac == "no",
+        "not_unique": None if _yn(row["unique"]) is None else not _yn(row["unique"]),
+        "expl_error": None if _yn(row["faithful"]) is None else not _yn(row["faithful"]),
+        "hallucination": _yn(row["halluc"]),
+        "off_topic": None if _yn(row["on_topic"]) is None else not _yn(row["on_topic"]),
+    }
+    dims = [h[k] for k in h]
+    h["bad"] = None if any(d is None for d in dims) else any(dims)
+    return h
+
+
+def judge_labels(pq: dict) -> dict:
+    j = pq.get("judge") or {}
+    return {
+        "answer_wrong": j.get("answer_correct") == "no",
+        "not_unique": not j.get("unique_answer", True),
+        "expl_error": not j.get("explanation_faithful", True),
+        "hallucination": bool(j.get("hallucination")),
+        "off_topic": not j.get("on_topic", True),
+        "bad": flagged(pq),  # 与 report.py 的"综合好题"互补：含盲答不一致
+    }
+
+
+DIMS = ["bad", "answer_wrong", "not_unique", "expl_error", "hallucination", "off_topic"]
+
+
+def read_filled(xlsx: str) -> dict[str, dict]:
+    from openpyxl import load_workbook
+
+    ws = load_workbook(xlsx, read_only=True)["标注"]
+    out = {}
+    for r in ws.iter_rows(min_row=2, values_only=True):
+        if not r or not r[0]:
+            continue
+        out[str(r[0])] = {"type": r[2], "answer_correct": r[7], "unique": r[8], "faithful": r[9],
+                          "halluc": r[10], "distractor": r[11], "on_topic": r[12], "note": r[13]}
+    return out
+
+
+def _weighted_stats(items: list[dict], w: dict[str, float], dim: str) -> dict:
+    """items: {stratum, h, j}；返回按层权重还原的总体估计。"""
+    cm = {"tp": 0.0, "fp": 0.0, "fn": 0.0, "tn": 0.0}
+    raw = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
+    for it in items:
+        h, jv = it["h"][dim], it["j"][dim]
+        if h is None:
+            continue
+        k = ("tp" if jv else "fn") if h else ("fp" if jv else "tn")
+        cm[k] += w[it["stratum"]]
+        raw[k] += 1
+    tot = sum(cm.values()) or 1.0
+    r = {"n": sum(raw.values()), "raw_confusion": raw,
+         "human_rate": (cm["tp"] + cm["fn"]) / tot, "judge_rate": (cm["tp"] + cm["fp"]) / tot,
+         "agreement": (cm["tp"] + cm["tn"]) / tot,
+         "precision": cm["tp"] / (cm["tp"] + cm["fp"]) if cm["tp"] + cm["fp"] else None,
+         "recall": cm["tp"] / (cm["tp"] + cm["fn"]) if cm["tp"] + cm["fn"] else None}
+    pe = r["human_rate"] * r["judge_rate"] + (1 - r["human_rate"]) * (1 - r["judge_rate"])
+    r["kappa"] = (r["agreement"] - pe) / (1 - pe) if pe < 1 else None
+    return r
+
+
+def _bootstrap(items, w, dim, keys=("human_rate", "agreement", "precision", "recall"), n=2000, seed=SEED):
+    rng = random.Random(seed)
+    strata = {}
+    for it in items:
+        strata.setdefault(it["stratum"], []).append(it)
+    samples = {k: [] for k in keys}
+    for _ in range(n):
+        res = [rng.choice(v) for v in strata.values() for _ in v]
+        st = _weighted_stats(res, w, dim)
+        for k in keys:
+            if st[k] is not None:
+                samples[k].append(st[k])
+    ci = {}
+    for k, xs in samples.items():
+        xs.sort()
+        ci[k] = [xs[int(0.025 * len(xs))], xs[int(0.975 * len(xs)) - 1]] if xs else None
+    return ci
+
+
+def score(tag: str, xlsx: str, meta_path: str, out: str | None, annotator: str) -> dict:
+    meta = json.loads(Path(meta_path).read_text(encoding="utf-8"))
+    assert meta["tag"] == tag, f"meta tag {meta['tag']} != {tag}"
+    filled = read_filled(xlsx)
+    rows = {(k, q["id"]): pq for k, _rec, q, pq in collect(tag)}
+    strata_n = {"flagged": 0, "random": 0}
+    for v in meta["items"].values():
+        strata_n[v["stratum"]] += 1
+    # 层权重：flagged 层代表 judge 标记池，random 层代表未标记池
+    w = {"flagged": meta["n_flagged_total"] / strata_n["flagged"], "random": meta["n_ok_total"] / strata_n["random"]}
+    items, disagreements, distractor = [], [], []
+    for uid, m in sorted(meta["items"].items()):
+        if uid not in filled:
+            continue
+        pq = rows[(m["cache_key"], m["qid"])]
+        h, j = human_labels(filled[uid]), judge_labels(pq)
+        items.append({"uid": uid, "stratum": m["stratum"], "h": h, "j": j})
+        hd = filled[uid]["distractor"]
+        if pq["type"] != "judge" and hd not in (None, ""):
+            distractor.append((int(hd), int((pq.get("judge") or {}).get("distractor_quality") or 0)))
+        diff = [d for d in DIMS[1:] if h[d] is not None and h[d] != j[d]]
+        if diff or (h["bad"] is not None and h["bad"] != j["bad"]):
+            disagreements.append({"uid": uid, "stratum": m["stratum"], "dims": diff,
+                                  "human_bad": h["bad"], "pipeline_flag": j["bad"],
+                                  "solver_agrees": pq["solver_agrees"],
+                                  "judge_issue": (pq.get("judge") or {}).get("issue", ""),
+                                  "human_note": filled[uid]["note"]})
+    report = {
+        "tag": tag, "judge_version": meta["judge_version"], "annotator": annotator,
+        "n_items": len(items), "strata_n": strata_n, "strata_weight": w,
+        "note": "按 flagged/random 分层权重还原到全部 baseline 题；human_rate 为人工判定的总体问题率估计",
+        "dims": {d: {**_weighted_stats(items, w, d), "ci95": _bootstrap(items, w, d)} for d in DIMS},
+        "by_stratum": {s: {d: _weighted_stats([i for i in items if i["stratum"] == s], w, d) for d in DIMS}
+                       for s in strata_n},
+        "distractor": {
+            "n": len(distractor),
+            "exact_agree": sum(a == b for a, b in distractor) / len(distractor) if distractor else None,
+            "mae": sum(abs(a - b) for a, b in distractor) / len(distractor) if distractor else None,
+            "human_mean": sum(a for a, _ in distractor) / len(distractor) if distractor else None,
+            "judge_mean": sum(b for _, b in distractor) / len(distractor) if distractor else None,
+        },
+        "disagreements": disagreements,
+    }
+    out = out or str(RESULTS / tag / f"calibration_{meta['judge_version']}.json")
+    Path(out).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(json.dumps({k: v for k, v in report.items() if k not in ("disagreements", "by_stratum")},
+                     ensure_ascii=False, indent=1))
+    print(f"wrote {out}; disagreements={len(disagreements)}")
+    return report
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["make"])
+    ap.add_argument("cmd", choices=["make", "score"])
     ap.add_argument("--tag", required=True)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out")
+    ap.add_argument("--xlsx", help="score: 回收的标注表")
+    ap.add_argument("--meta", help="score: make 生成的 .meta.json")
+    ap.add_argument("--annotator", default="human", help="score: 标注来源说明，写入报告")
     a = ap.parse_args()
-    make(a.tag, a.out)
+    if a.cmd == "make":
+        make(a.tag, a.out)
+    else:
+        score(a.tag, a.xlsx, a.meta, a.out, a.annotator)
