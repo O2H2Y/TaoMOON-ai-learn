@@ -52,9 +52,10 @@ export default function IndexPage() {
         if (status === 'running') setLoadingText('AI 正在生成题目...')
       })
 
-      // 若配图有提示（如未登录/额度不足），友好告知，不阻断闯关
-      if (quizData.image_notice) {
-        Taro.showToast({ title: quizData.image_notice, icon: 'none', duration: 3000 })
+      // 联网搜索失败 / 配图有提示（如未登录/额度不足）时友好告知，不阻断闯关
+      const notices = [quizData.search_notice, quizData.image_notice].filter(Boolean)
+      if (notices.length > 0) {
+        Taro.showToast({ title: notices.join('；'), icon: 'none', duration: 3000 })
       }
 
       // 3. 跳转闯关页

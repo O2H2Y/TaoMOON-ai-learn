@@ -59,6 +59,9 @@ class QuizGenerateResponse(BaseModel):
     image_notice: str | None = Field(
         default=None, description="配图相关的提示信息（如未登录/额度已用完/部分题目未配图等），无异常时为 None"
     )
+    search_notice: str | None = Field(
+        default=None, description="联网搜索失败/超时时的提示（本次题目未参考联网资料），正常或未开启搜索时为 None"
+    )
 
 
 class AnswerRecord(BaseModel):

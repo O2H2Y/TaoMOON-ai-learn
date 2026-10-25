@@ -17,6 +17,8 @@ from evals.datasets.split import get_split
 from evals.scorers.judge import JUDGE_VERSION
 from evals.scorers.rules import score_quiz
 
+from app.observability.run_context import is_tool_error
+
 RESULTS = Path(__file__).parent / "results"
 
 
@@ -26,7 +28,7 @@ def context_diag(rec: dict) -> dict:
         return {"status": "none", "n_tool_calls": 0, "tool_errors": 0, "no_tool": True, "all_tools_failed": False}
     c = ctxs[0]
     ev = c.get("evidence", [])
-    errs = sum(1 for e in ev if str(e.get("content", "")).lstrip().startswith("{'error'"))
+    errs = sum(1 for e in ev if e.get("is_error", is_tool_error(e.get("content", ""))))
     return {
         "status": c["status"],
         "n_tool_calls": len(c.get("tool_calls", [])),

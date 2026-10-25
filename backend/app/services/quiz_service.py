@@ -22,7 +22,7 @@ from app.repositories import knowledge_repository
 from app.services import rag_service
 from app.services import image_service
 from app.services.search_service import fetch_knowledge_context
-from app.observability import start_run, stage
+from app.observability import current_run, start_run, stage
 from app.prompts.registry import prompt_version_tag
 
 logger = structlog.get_logger()
@@ -75,6 +75,22 @@ async def _fetch_context(req: QuizGenerateRequest, user_id: Optional[int]) -> st
     if req.doc_id is not None:
         return await rag_service.fetch_rag_context(req.user_input, user_id, req.doc_id)
     return await fetch_knowledge_context(req.user_input)
+
+
+SEARCH_FAILED_NOTICE = "联网搜索失败，本次题目由 AI 根据已有知识生成，可能不含最新信息"
+
+
+def _search_notice(req: QuizGenerateRequest) -> Optional[str]:
+    """联网搜索没拿到资料（报错/超时/空结果）时给用户的提示；未开启搜索或走知识库时不提示。"""
+    if req.doc_id is not None:
+        return None
+    run = current_run()
+    if run is None:
+        return None
+    web = [c for c in run.contexts if c.source == "web"]
+    if web and web[-1].status in ("error", "timeout", "empty"):
+        return SEARCH_FAILED_NOTICE
+    return None
 
 
 async def handle_quiz_generate(
@@ -147,6 +163,7 @@ async def _generate_and_persist(
         summary=quiz_output.summary,
         questions=quiz_output.questions,
         image_notice=image_notice,
+        search_notice=_search_notice(req),
     )
 
 
@@ -247,6 +264,7 @@ async def _run_quiz_task_inner(
             summary=quiz_output.summary,
             questions=quiz_output.questions,
             image_notice=image_notice,
+            search_notice=_search_notice(req),
         )
 
         await task_repository.update_task_status(

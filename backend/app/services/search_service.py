@@ -187,6 +187,18 @@ async def _fetch(user_input: str) -> ContextResult:
 
         record_llm_usage("web_search_agent", settings.deepseek_model, messages)
         tool_calls, evidence = extract_agent_trace(messages)
+        tool_errors = sum(1 for e in evidence if e.get("is_error"))
+
+        # 所有工具调用都报错：Agent 的最终回复只是"没找到资料"之类的话，不是真实资料。
+        # 判为失败，不把它当参考资料喂给出题模型（出题降级为不联网，与未开启搜索时一致）。
+        if evidence and tool_errors == len(evidence):
+            first_err = str(evidence[0].get("content", ""))[:300]
+            logger.warning("search_all_tools_failed", tool_errors=tool_errors, first_error=first_err)
+            return ContextResult(
+                source="web", status="error", max_length=MAX_CONTEXT_LENGTH,
+                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed,
+                tool_errors=tool_errors, error=f"all_tool_calls_failed: {first_err}",
+            )
 
         # 提取 Agent 最终回复
         raw = result["messages"][-1].content
@@ -194,7 +206,7 @@ async def _fetch(user_input: str) -> ContextResult:
             logger.warning("search_agent_empty_response")
             return ContextResult(
                 source="web", status="empty", max_length=MAX_CONTEXT_LENGTH,
-                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed,
+                tool_calls=tool_calls, evidence=evidence, elapsed_ms=elapsed, tool_errors=tool_errors,
             )
 
         content = raw
@@ -216,6 +228,7 @@ async def _fetch(user_input: str) -> ContextResult:
             tool_calls=tool_calls,
             evidence=evidence,
             elapsed_ms=elapsed,
+            tool_errors=tool_errors,
         )
 
     except asyncio.TimeoutError:

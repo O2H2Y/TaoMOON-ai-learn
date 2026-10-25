@@ -31,6 +31,7 @@ class ContextResult:
     evidence: list[dict[str, Any]] = field(default_factory=list)  # [{tool, content}]
     elapsed_ms: int = 0
     error: str = ""
+    tool_errors: int = 0  # 工具调用报错的次数（401、代理错误、参数错误等）
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -209,6 +210,20 @@ def record_raw_output(name: str, text: str) -> None:
         record.raw_outputs[name] = text
 
 
+def is_tool_error(content: Any, status: Any = None) -> bool:
+    """判断一条工具输出是否是报错，而不是真实资料。
+
+    兼容两种形态：langchain_tavily 捕获异常后返回 {"error": ...}（序列化成 "{'error': ...}"），
+    以及 langgraph ToolNode 捕获异常后 status="error" / 内容以 "Error" 开头。
+    """
+    if status == "error":
+        return True
+    if isinstance(content, dict):
+        return "error" in content and len(content) <= 2
+    text = str(content or "").lstrip()
+    return text.startswith("{'error'") or text.startswith('{"error"') or text.startswith("Error:")
+
+
 def extract_agent_trace(messages: list[Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """从 ReAct agent 的消息链路中抽取工具调用与原始工具输出（证据）。"""
     try:
@@ -229,6 +244,7 @@ def extract_agent_trace(messages: list[Any]) -> tuple[list[dict[str, Any]], list
                     "tool": getattr(m, "name", None),
                     "content": content[:MAX_EVIDENCE_CHARS],
                     "content_length": len(content),
+                    "is_error": is_tool_error(content, getattr(m, "status", None)),
                 }
             )
     return tool_calls, evidence
