@@ -1,6 +1,8 @@
 """结构化输出 + 校验失败自动重试。
 
-用 LangChain 的 with_structured_output（DeepSeek 走 function calling）让模型直接按 Pydantic schema 输出，
+用 LangChain 的 with_structured_output(method="json_mode")：DeepSeek 的 JSON Output 模式（response_format=json_object）
+保证返回合法 JSON，再由 Pydantic 校验。没用 function_calling：2026-10-25 dev 回放中 deepseek-flash 在工具参数里
+常写出未转义的英文双引号（中文语境引号），约 12% 的调用解析失败；json_mode 无此问题。
 解析或业务校验失败时自动重试；全部失败才抛错。每次尝试的 token 用量与原始输出都会记入 RunRecord。
 """
 
@@ -80,7 +82,7 @@ async def invoke_structured(
     max_attempts: int = 2,
 ) -> T:
     """调用模型拿结构化结果；解析失败或 validator 报问题时重试，最多 max_attempts 次。"""
-    structured = llm.with_structured_output(schema, method="function_calling", include_raw=True)
+    structured = llm.with_structured_output(schema, method="json_mode", include_raw=True)
     chain = prompt | structured
     model_name = getattr(llm, "model_name", "") or ""
     problems: list[str] = []
@@ -98,7 +100,7 @@ async def invoke_structured(
         record = current_run()
         if record is not None:
             record.metadata[f"{stage_name}_attempts"] = attempt
-            record.metadata["output_mode"] = "function_calling"
+            record.metadata["output_mode"] = "json_mode"
         if not problems:
             return result  # type: ignore[return-value]
         logger.warning("structured_output_invalid", stage=stage_name, attempt=attempt, problems=problems[:5])

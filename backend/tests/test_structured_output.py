@@ -40,11 +40,11 @@ def _llm_with_chain(outputs):
 
 
 @pytest.mark.asyncio
-async def test_uses_function_calling_with_raw():
+async def test_uses_json_mode_with_raw():
     prompt, llm, chain = _llm_with_chain([_out(parsed=_quiz(_q()))])
     result = await invoke_structured(prompt, llm, QuizOutput, {}, "quiz_generate")
     assert result.title == "T"
-    llm.with_structured_output.assert_called_once_with(QuizOutput, method="function_calling", include_raw=True)
+    llm.with_structured_output.assert_called_once_with(QuizOutput, method="json_mode", include_raw=True)
     assert chain.ainvoke.await_count == 1
 
 
