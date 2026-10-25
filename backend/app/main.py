@@ -31,6 +31,9 @@ async def lifespan(app: FastAPI):
     if settings.mysql_auto_init:
         await init_mysql()
     yield
+    from app.observability.tracing import flush_tracing
+
+    flush_tracing()
     await close_mysql_pool()
     logger.info("app_shutting_down")
 

@@ -38,6 +38,18 @@ def _langfuse_ready() -> bool:
         return False
 
 
+def flush_tracing() -> None:
+    """把缓冲中的 trace 发出去。短进程（评测脚本）退出前、服务关闭时调用。"""
+    if not _langfuse_ready():
+        return
+    try:
+        from langfuse import get_client
+
+        get_client().flush()
+    except Exception as e:
+        logger.warning("langfuse_flush_failed", error=str(e))
+
+
 def get_trace_callbacks() -> list[Any]:
     """返回需要注入到 LangChain/LangGraph 调用里的 callback 列表。"""
     if not _langfuse_ready():

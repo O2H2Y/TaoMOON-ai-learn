@@ -176,4 +176,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    from app.observability.tracing import flush_tracing
+
+    try:
+        asyncio.run(main())
+    finally:
+        flush_tracing()
