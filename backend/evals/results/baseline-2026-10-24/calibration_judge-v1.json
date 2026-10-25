@@ -1,7 +1,7 @@
 {
  "tag": "baseline-2026-10-24",
  "judge_version": "judge-v1",
- "annotator": "user-v1 (含依据工作表)",
+ "annotator": "AI 辅助标注（用户确认 2026-10-25；带来源依据，非纯人工 GT，记为 silver+）",
  "n_items": 60,
  "strata_n": {
   "flagged": 30,
